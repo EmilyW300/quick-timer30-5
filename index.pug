@@ -1,26 +1,54 @@
 doctype html
 html
   head
-    meta(charset="utf-8")
-    link(rel="stylesheet",type="text/css",href="bootstrap3.min.css")
-    link(rel="stylesheet",type="text/css",href="index.css")
-    script(type="text/javascript",src="jquery-1.10.2.min.js")
-    script(type="text/javascript",src="bootstrap3.min.js")
-    script(type="text/javascript",src="index.js")
+    meta(charset='utf-8')
+    title Pomodoro Flip Timer
+    link(rel='stylesheet', type='text/css', href='index.css')
+    script(type='text/javascript', src='index.js')
   body
-    #timer ????
-    a#min60.btn.btn-info.fbtn(onclick="adjust(-60)") -60
-    a#min10.btn.btn-info.fbtn(onclick="adjust(-10)") -10
-    a#toggle.btn.btn-primary(onclick="toggle()") RUN
-    a#reset.btn.btn-warning(onclick="reset()") RESET
-    a#hide.btn.btn-default(onclick="show()") &#xd60;
-    a#add10.btn.btn-info.fbtn(onclick="adjust(10)") +10
-    a#add60.btn.btn-info.fbtn(onclick="adjust(60)") +60
-    a#def10.btn.btn-success.fbtn(onclick="adjust(0,10)") 10 sec
-    a#def30.btn.btn-success.fbtn(onclick="adjust(0,30)") 30 sec
-    a#def60.btn.btn-success.fbtn(onclick="adjust(0,60)") 1 min
-    a#def180.btn.btn-success.fbtn(onclick="adjust(0,180)") 3 min
-    a#def300.btn.btn-success.fbtn(onclick="adjust(0,300)") 5 min
-    a#def600.btn.btn-success.fbtn(onclick="adjust(0,600)") 10 min
-    a#def900.btn.btn-success.fbtn(onclick="adjust(0,900)") 15 min
-    a#def1800.btn.btn-success.fbtn(onclick="adjust(0,1800)") 30 min
+    .timer-page
+      .sky-layer
+        .moon-scene
+          .moon
+          .stars
+            span.star.s1
+            span.star.s2
+            span.star.s3
+            span.star.s4
+            span.star.s5
+            span.star.s6
+        .sun-scene
+          .sun
+          .cloud.c1
+          .cloud.c2
+          .cloud.c3
+
+      .controls
+        button#tomato-btn(type='button', aria-label='開始 25 分鐘')
+          span.icon 🍅
+          span.text 開始 25 分鐘
+        button#pause-btn(type='button', aria-label='暫停或繼續')
+          span.icon ⏸️
+        button#restart-btn(type='button', aria-label='重新開始')
+          span.icon 🔁
+
+      .clock(role='timer', aria-live='polite')
+        .digit-card(data-slot='m-ten')
+          span.number 2
+        .digit-card(data-slot='m-one')
+          span.number 5
+        .colon :
+        .digit-card(data-slot='s-ten')
+          span.number 0
+        .digit-card(data-slot='s-one')
+          span.number 0
+
+      p.hint 點擊蕃茄開始 25 分鐘專注倒數，暫停與重啟都能即時更新。
+
+      .pause-panel
+        .pause-count
+          span.label 暫停次數
+          #pause-squares(aria-live='polite')
+        button#reset-pauses(type='button', aria-label='清除暫停紀錄')
+          span.icon 🧹
+          span.text 歸零暫停累計

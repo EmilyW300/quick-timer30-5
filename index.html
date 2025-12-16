@@ -1,1 +1,74 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" type="text/css" href="bootstrap3.min.css"><link rel="stylesheet" type="text/css" href="index.css"><script type="text/javascript" src="jquery-1.10.2.min.js"></script><script type="text/javascript" src="bootstrap3.min.js"></script><script type="text/javascript" src="index.js"></script></head><body><div id="timer">????</div><a class="btn btn-info fbtn" id="min60" onclick="adjust(-60)">-60</a><a class="btn btn-info fbtn" id="min10" onclick="adjust(-10)">-10</a><a class="btn btn-primary" id="toggle" onclick="toggle()">RUN</a><a class="btn btn-warning" id="reset" onclick="reset()">RESET</a><a class="btn btn-default" id="hide" onclick="show()">&#xd60;</a><a class="btn btn-info fbtn" id="add10" onclick="adjust(10)">+10</a><a class="btn btn-info fbtn" id="add60" onclick="adjust(60)">+60</a><a class="btn btn-success fbtn" id="def10" onclick="adjust(0,10)">10 sec</a><a class="btn btn-success fbtn" id="def30" onclick="adjust(0,30)">30 sec</a><a class="btn btn-success fbtn" id="def60" onclick="adjust(0,60)">1 min</a><a class="btn btn-success fbtn" id="def180" onclick="adjust(0,180)">3 min</a><a class="btn btn-success fbtn" id="def300" onclick="adjust(0,300)">5 min</a><a class="btn btn-success fbtn" id="def600" onclick="adjust(0,600)">10 min</a><a class="btn btn-success fbtn" id="def900" onclick="adjust(0,900)">15 min</a><a class="btn btn-success fbtn" id="def1800" onclick="adjust(0,1800)">30 min</a></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pomodoro Flip Timer</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+  <div class="timer-page">
+    <div class="sky-layer">
+      <div class="moon-scene">
+        <div class="moon"></div>
+        <div class="stars">
+          <span class="star s1"></span>
+          <span class="star s2"></span>
+          <span class="star s3"></span>
+          <span class="star s4"></span>
+          <span class="star s5"></span>
+          <span class="star s6"></span>
+        </div>
+      </div>
+      <div class="sun-scene">
+        <div class="sun"></div>
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="cloud c3"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="tomato-btn" type="button" aria-label="開始 25 分鐘">
+        <span class="icon">🍅</span>
+        <span class="text">開始 25 分鐘</span>
+      </button>
+      <button id="pause-btn" type="button" aria-label="暫停或繼續">
+        <span class="icon">⏸️</span>
+      </button>
+      <button id="restart-btn" type="button" aria-label="重新開始">
+        <span class="icon">🔁</span>
+      </button>
+    </div>
+
+    <div class="clock" role="timer" aria-live="polite">
+      <div class="digit-card" data-slot="m-ten">
+        <span class="number">2</span>
+      </div>
+      <div class="digit-card" data-slot="m-one">
+        <span class="number">5</span>
+      </div>
+      <div class="colon">:</div>
+      <div class="digit-card" data-slot="s-ten">
+        <span class="number">0</span>
+      </div>
+      <div class="digit-card" data-slot="s-one">
+        <span class="number">0</span>
+      </div>
+    </div>
+
+    <p class="hint">點擊蕃茄開始 25 分鐘專注倒數，暫停與重啟都能即時更新。</p>
+
+    <div class="pause-panel">
+      <div class="pause-count">
+        <span class="label">暫停次數</span>
+        <div id="pause-squares" aria-live="polite"></div>
+      </div>
+      <button id="reset-pauses" type="button" aria-label="清除暫停紀錄">
+        <span class="icon">🧹</span>
+        <span class="text">歸零暫停累計</span>
+      </button>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,119 +1,103 @@
-start = null
-is-blink = false
-is-light = true
-is-run = false
-is-show = true
-is-warned = false
-handler = null
-latency = 0
-stop-by = null
-delay = 60000
-audio-remind = null
-audio-end = null
+TOTAL-SECONDS = 25 * 60
 
-new-audio = (file) ->
-  node = new Audio!
-    ..src = file
-    ..loop = false
-    ..load!
-  document.body.appendChild node
-  return node
+state =
+  remaining: TOTAL-SECONDS
+  timer: null
+  running: false
+  pause-count: 0
+  elapsed: 0
+  end-sound: null
 
-sound-toggle = (des, state) ->
-  if state => des.play!
-  else des
-    ..currentTime = 0
-    ..pause!
+digit-elements = {}
+slots = <[m-ten m-one s-ten s-one]>
 
-show = ->
-  is-show := !is-show
-  $ \.fbtn .css \opacity, if is-show => \1.0 else \0.1
+format-time = (seconds) ->
+  minutes = Math.floor seconds / 60
+  secs = seconds % 60
+  [Math.floor(minutes / 10), minutes % 10, Math.floor(secs / 10), secs % 10]
 
-adjust = (it,v) ->
-  if is-blink => return
-  delay := delay + it * 1000
-  if it==0 => delay := v * 1000
-  if delay <= 0 => delay := 0
-  $ \#timer .text delay
-  resize!
+update-display = ->
+  values = format-time state.remaining
+  for val, idx in values
+    digit-elements[slots[idx]].textContent = val
 
-toggle = ->
-  is-run := !is-run
-  $ \#toggle .text if is-run => "STOP" else "RUN"
-  if !is-run and handler => 
-    stop-by := new Date!
-    clearInterval handler
-    handler := null
-    sound-toggle audio-end, false
-    sound-toggle audio-remind, false
-  if stop-by =>
-    latency := latency + (new Date!)getTime! - stop-by.getTime!
-  if is-run => run!
+set-running = (is-running) ->
+  state.running = is-running
+  document.getElementById('pause-btn').classList.toggle 'active', !state.running and state.remaining != TOTAL-SECONDS
+  document.getElementById('tomato-btn').classList.toggle 'active', state.running
 
-reset = ->
-  if delay == 0 => delay := 1000
-  sound-toggle audio-remind, false
-  sound-toggle audio-end, false
-  stop-by := 0
-  is-warned := false
-  is-blink := false
-  latency := 0
-  start := null #new Date!
-  is-run := true
-  toggle!
-  if handler => clearInterval handler
-  handler := null
-  $ \#timer .text delay
-  $ \#timer .css \color, \#fff
-  resize!
+apply-scene-progress = ->
+  if state.elapsed >= 30 => document.body.classList.add 'show-moon'
+  if state.elapsed >= 60 => document.body.classList.add 'show-sun'
 
+reset-scenes = ->
+  state.elapsed = 0
+  document.body.classList.remove 'show-moon'
+  document.body.classList.remove 'show-sun'
 
-blink = ->
-  is-blink := true
-  is-light := !is-light
-  $ \#timer .css \color, if is-light => \#fff else \#f00
+render-pause-squares = ->
+  squares = document.getElementById 'pause-squares'
+  squares.innerHTML = ''
+  for i from 0 til state.pause-count
+    squares.appendChild document.createElement 'span'
 
-count = ->
-  tm = $ \#timer
-  diff = start.getTime! - (new Date!)getTime! + delay + latency
-  if diff > 60000 => is-warned := false
-  if diff < 60000 and !is-warned =>
-    is-warned := true
-    sound-toggle audio-remind, true
-  if diff < 55000 => sound-toggle audio-remind, false
-  if diff < 0 and !is-blink =>
-    sound-toggle audio-end, true
-    is-blink := true
-    diff = 0
-    clearInterval handler
-    handler := setInterval ( -> blink!), 500
-  tm.text "#{diff}"
-  resize!
+tick = ->
+  if state.remaining > 0 =>
+    state.remaining -= 1
+    state.elapsed += 1
+    apply-scene-progress!
+    update-display!
+    if state.remaining == 0 =>
+      clearInterval state.timer
+      state.timer := null
+      set-running false
+      if state.end-sound =>
+        state.end-sound.currentTime = 0
+        state.end-sound.play!
 
-run =  ->
-  if start == null =>
-    start := new Date!
-    latency := 0
-    is-blink := false
-  if handler => clearInterval handler
-  if is-blink => handler := setInterval (-> blink!), 500
-  else handler := setInterval (-> count!), 100
+start-pomodoro = ->
+  if state.timer => clearInterval state.timer
+  reset-scenes!
+  state.remaining = TOTAL-SECONDS
+  update-display!
+  set-running true
+  state.timer := setInterval tick, 1000
 
-resize = ->
-  tm = $ \#timer
-  w = tm.width!
-  h = $ window .height!
-  len = tm.text!length
-  len>?=3
-  tm.css \font-size, "#{1.5 * w/len}px"
-  tm.css \line-height, "#{h}px"
+pause-timer = ->
+  return unless state.running and state.timer
+  clearInterval state.timer
+  state.timer := null
+  state.running = false
+  state.pause-count += 1
+  render-pause-squares!
+  set-running false
 
+resume-timer = ->
+  return if state.running or state.remaining <= 0
+  state.timer := setInterval tick, 1000
+  set-running true
 
-window.onload = ->
-  $ \#timer .text delay
-  resize!
-  #audio-remind := new-audio \audio/cop-car.mp3
-  #audio-end := new-audio \audio/fire-alarm.mp3
-  audio-remind := new-audio \audio/smb_warning.mp3
-  audio-end := new-audio \audio/smb_mariodie.mp3
-window.onresize = -> resize!
+restart-timer = ->
+  if state.timer => clearInterval state.timer
+  reset-scenes!
+  state.remaining = TOTAL-SECONDS
+  update-display!
+  set-running false
+  state.timer := null
+
+setup = ->
+  slots.map -> digit-elements[it] = document.querySelector "[data-slot=#{it}] .number"
+  state.end-sound = new Audio 'audio/smb_mariodie.mp3'
+  state.end-sound.load!
+  document.getElementById('tomato-btn').addEventListener 'click', -> start-pomodoro!
+  document.getElementById('pause-btn').addEventListener 'click', ->
+    if state.running => pause-timer!
+    else resume-timer!
+  document.getElementById('restart-btn').addEventListener 'click', -> restart-timer!
+  document.getElementById('reset-pauses').addEventListener 'click', ->
+    state.pause-count = 0
+    render-pause-squares!
+  render-pause-squares!
+  update-display!
+
+window.onload = -> setup!
