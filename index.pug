@@ -6,10 +6,21 @@ html
     link(rel="stylesheet",type="text/css",href="index.css")
     script(type="text/javascript",src="index.js")
   body
+    .cosmos
+      .stars
+      .stars.stars-b
+      .moon
     .timer-page
-      button#tomato-btn(type="button")
-        span.icon 🍅
-        span.text 25 分鐘番茄鐘
+      .controls
+        button#tomato-btn.control-btn(type="button")
+          span.icon 🍅
+          span.text 25 分鐘番茄鐘
+        button#pause-btn.control-btn(type="button")
+          span.icon ⏸
+          span.text Pause
+        button#reset-btn.control-btn(type="button")
+          span.icon 🔄
+          span.text Reset
       .clock(role="timer", aria-live="polite")
         .flip-card(data-slot="m-ten", data-value="2")
           span.top 2
@@ -32,4 +43,11 @@ html
           span.bottom 0
           span.flip-top 0
           span.flip-bottom 0
-      p.hint 點擊蕃茄開始 25 分鐘專注倒數，時間會以復古翻頁鐘呈現。
+      p.hint 點擊蕃茄開始 25 分鐘專注倒數，Pause 可以暫停時計，Reset 會清除紀錄。
+      .pause-meter(role="status", aria-live="polite")
+        .tomato-counter(aria-label="Pause 次數")
+          span.tomato-emoji 🍅
+          span.tomato-count#pause-count 0
+        .meter-text
+          .meter-label Pause 次數
+          .meter-hint 每次暫停都會累積在綠色蕃茄裡
