@@ -17,9 +17,22 @@ let's count down!
 
 這樣的流程能讓衝突處理更有條理，也避免遺漏重要變更。
 
+### 目前專案的衝突狀態與對應指引
+
+- **目前狀態**：使用 `git diff --name-only --diff-filter=U` 與 `rg "<<<<<<<"` 檢查後，沒有發現任何尚未解決的衝突標記，因此工作目錄目前是乾淨的。
+- **如果之後出現衝突**：
+  - 檔案裡會出現三段標記：
+    - `<<<<<<< HEAD` 之後到 `=======` 之間代表你本地的內容。
+    - `=======` 到 `>>>>>>> branch-name` 之間代表來自另一個分支（或遠端）的內容。
+  - 依需求決定要保留哪段、或將兩邊合併重寫，再把這些標記全部刪除。
+  - 清理完成後，重新閱讀周邊程式碼，確保縮排、括號與結構正確，再跑一次測試或手動檢查主要功能。
+  - 最後用 `git add <file>`、`git commit` 紀錄修正，再繼續後續的開發或推送。
+
+有任何衝突都可以依照上面步驟逐一檢查與處理，必要時也可以使用比對工具（例如 VS Code 的比較檢視）協助合併。
+
 Demo
 ----------
-please check [this demo](http://zbryikt.github.io/quick_timer) for this timer. 
+please check [this demo](http://zbryikt.github.io/quick_timer) for this timer.
 
 License
 ----------
