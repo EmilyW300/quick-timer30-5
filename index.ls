@@ -1,119 +1,70 @@
-start = null
-is-blink = false
-is-light = true
-is-run = false
-is-show = true
-is-warned = false
-handler = null
-latency = 0
-stop-by = null
-delay = 60000
-audio-remind = null
-audio-end = null
+TOTAL-SECONDS = 25 * 60
 
-new-audio = (file) ->
-  node = new Audio!
-    ..src = file
-    ..loop = false
-    ..load!
-  document.body.appendChild node
-  return node
+state =
+  remaining: TOTAL-SECONDS
+  timer: null
+  end-sound: null
 
-sound-toggle = (des, state) ->
-  if state => des.play!
-  else des
-    ..currentTime = 0
-    ..pause!
+digits = {}
+slots = <[m-ten m-one s-ten s-one]>
 
-show = ->
-  is-show := !is-show
-  $ \.fbtn .css \opacity, if is-show => \1.0 else \0.1
+format-time = (seconds) ->
+  minutes = Math.floor seconds / 60
+  secs = seconds % 60
+  [Math.floor(minutes / 10), minutes % 10, Math.floor(secs / 10), secs % 10]
 
-adjust = (it,v) ->
-  if is-blink => return
-  delay := delay + it * 1000
-  if it==0 => delay := v * 1000
-  if delay <= 0 => delay := 0
-  $ \#timer .text delay
-  resize!
+flip-to = (card, new-val, force=false) ->
+  current = card.getAttribute \data-value
+  if !force and current == String new-val => return
+  card.setAttribute \data-value, new-val
+  top = card.querySelector \.top
+  bottom = card.querySelector \.bottom
+  flip-top = card.querySelector \.flip-top
+  flip-bottom = card.querySelector \.flip-bottom
+  flip-top.textContent = top.textContent
+  flip-bottom.textContent = new-val
+  card.classList.remove \play
+  _ = card.offsetWidth
+  card.classList.add \play
+  setTimeout (->
+    top.textContent = new-val
+    bottom.textContent = new-val
+  ), 250
 
-toggle = ->
-  is-run := !is-run
-  $ \#toggle .text if is-run => "STOP" else "RUN"
-  if !is-run and handler => 
-    stop-by := new Date!
-    clearInterval handler
-    handler := null
-    sound-toggle audio-end, false
-    sound-toggle audio-remind, false
-  if stop-by =>
-    latency := latency + (new Date!)getTime! - stop-by.getTime!
-  if is-run => run!
+update-display = (force=false) ->
+  values = format-time state.remaining
+  for val, idx in values
+    flip-to digits[slots[idx]], val, force
 
-reset = ->
-  if delay == 0 => delay := 1000
-  sound-toggle audio-remind, false
-  sound-toggle audio-end, false
-  stop-by := 0
-  is-warned := false
-  is-blink := false
-  latency := 0
-  start := null #new Date!
-  is-run := true
-  toggle!
-  if handler => clearInterval handler
-  handler := null
-  $ \#timer .text delay
-  $ \#timer .css \color, \#fff
-  resize!
+finish = ->
+  if state.timer =>
+    clearInterval state.timer
+    state.timer := null
+  if state.end-sound =>
+    state.end-sound.currentTime = 0
+    state.end-sound.play!
 
+reset-timer = ->
+  if state.timer =>
+    clearInterval state.timer
+  state.remaining := TOTAL-SECONDS
+  state.timer := null
 
-blink = ->
-  is-blink := true
-  is-light := !is-light
-  $ \#timer .css \color, if is-light => \#fff else \#f00
+start-pomodoro = ->
+  reset-timer!
+  update-display true
+  state.timer := setInterval ->
+    if state.remaining > 0 =>
+      state.remaining -= 1
+      update-display!
+      if state.remaining == 0 => finish!
+  , 1000
 
-count = ->
-  tm = $ \#timer
-  diff = start.getTime! - (new Date!)getTime! + delay + latency
-  if diff > 60000 => is-warned := false
-  if diff < 60000 and !is-warned =>
-    is-warned := true
-    sound-toggle audio-remind, true
-  if diff < 55000 => sound-toggle audio-remind, false
-  if diff < 0 and !is-blink =>
-    sound-toggle audio-end, true
-    is-blink := true
-    diff = 0
-    clearInterval handler
-    handler := setInterval ( -> blink!), 500
-  tm.text "#{diff}"
-  resize!
+setup = ->
+  slots.map -> digits[it] = document.querySelector "[data-slot=#{it}]"
+  state.end-sound = new Audio 'audio/smb_mariodie.mp3'
+  state.end-sound.load!
+  document.getElementById('tomato-btn').addEventListener 'click', -> start-pomodoro!
+  update-display true
 
-run =  ->
-  if start == null =>
-    start := new Date!
-    latency := 0
-    is-blink := false
-  if handler => clearInterval handler
-  if is-blink => handler := setInterval (-> blink!), 500
-  else handler := setInterval (-> count!), 100
-
-resize = ->
-  tm = $ \#timer
-  w = tm.width!
-  h = $ window .height!
-  len = tm.text!length
-  len>?=3
-  tm.css \font-size, "#{1.5 * w/len}px"
-  tm.css \line-height, "#{h}px"
-
-
-window.onload = ->
-  $ \#timer .text delay
-  resize!
-  #audio-remind := new-audio \audio/cop-car.mp3
-  #audio-end := new-audio \audio/fire-alarm.mp3
-  audio-remind := new-audio \audio/smb_warning.mp3
-  audio-end := new-audio \audio/smb_mariodie.mp3
-window.onresize = -> resize!
+window.onload = -> setup!

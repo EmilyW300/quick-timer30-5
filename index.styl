@@ -3,6 +3,7 @@ html, body
   padding: 0
   width: 100%
   height: 100%
+  font-family: 'Courier New', 'Noto Sans TC', monospace
   -webkit-touch-callout: none
   -webkit-user-select: none
   -khtml-user-select: none
@@ -10,70 +11,121 @@ html, body
   -ms-user-select: none
   user-select: none
 
-#timer
-  width: 100%
-  height: 100%
-  line-height: 100%
-  background: #000
-  color: #fff
+body
+  background: #ece3ff
+  display: flex
+  align-items: center
+  justify-content: center
+  color: #1a102b
+
+.timer-page
   text-align: center
+  width: 100%
+  max-width: 520px
+  padding: 20px
+
+#tomato-btn
+  background: linear-gradient(135deg, #ff6347, #e63b2f)
+  color: #fff
+  border: none
+  border-radius: 9999px
+  font-size: 20px
+  padding: 14px 26px
+  display: inline-flex
+  align-items: center
+  gap: 12px
+  box-shadow: 0 10px 25px rgba(230, 59, 47, 0.35)
+  cursor: pointer
+  transition: transform 0.12s ease, box-shadow 0.2s ease
+  margin-bottom: 34px
+  letter-spacing: 0.5px
+
+#tomato-btn:hover
+  transform: translateY(-2px)
+  box-shadow: 0 14px 28px rgba(230, 59, 47, 0.45)
+
+#tomato-btn:active
+  transform: translateY(0)
+  box-shadow: 0 8px 18px rgba(230, 59, 47, 0.3)
+
+#tomato-btn .icon
+  font-size: 26px
+
+.clock
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  gap: 12px
+  background: rgba(26, 16, 43, 0.14)
+  padding: 18px 22px
+  border-radius: 18px
+  box-shadow: 0 18px 45px rgba(26, 16, 43, 0.08)
+
+.colon
+  font-size: 68px
   font-weight: 700
-  font-family: century gothic
+  color: #1a102b
+  line-height: 1
 
-#hide, #toggle, #reset, #min10, #min60, #add10, #add60, #def10, #def30, #def60, #def180, #def300, #def600, #def900, #def1800
+.flip-card
+  position: relative
+  width: 84px
+  height: 116px
+  background: #1e1a2f
+  color: #f6f4ff
+  border-radius: 12px
+  box-shadow: 0 10px 25px rgba(26, 16, 43, 0.28)
+  perspective: 500px
+  overflow: hidden
+
+.flip-card span
   position: absolute
-  top: 5px
-  left: 50%
-  margin-left: -210px
-  width: 170px
-  height: 44px
-  line-height: 30px
-#reset
-  margin-left: 50px
-#hide
-  margin-left: -30px
-  width: 70px
+  left: 0
+  width: 100%
+  height: 50%
+  line-height: 58px
+  font-size: 62px
+  font-weight: 700
+  text-align: center
+  backface-visibility: hidden
+  background: #1e1a2f
 
-#min10, #min60, #add10, #add60
-  width: 50px
+.flip-card .top
+  top: 0
+  border-bottom: 1px solid #161323
 
-#def10, #def30, #def60, #def180, #def300, #def600, #def900, #def1800
-  bottom: 5px
-  top: auto
-  width: 70px
-#min10
-  margin-left: -270px
-#min60
-  margin-left: -330px
-#add10
-  margin-left: 230px
-#add60
-  margin-left: 290px
+.flip-card .bottom
+  bottom: 0
+  border-top: 1px solid #161323
 
-#def10
-  margin-left: -285px
-#def30
-  margin-left: -205px
-#def60
-  margin-left: -125px
-#def180
-  margin-left: -45px
-#def300
-  margin-left: 35px
-#def600
-  margin-left: 115px
-#def900
-  margin-left: 195px
-#def1800
-  margin-left: 275px
+.flip-card .flip-top
+  top: 0
+  transform-origin: center bottom
 
-#audio
-  position: absolute
-  bottom: 30px
-  right: 10px
-  z-index: 10
+.flip-card .flip-bottom
+  bottom: 0
+  transform-origin: center top
 
-#xxx
-  position: absolute
-  top: 10px
-  left: 10px
+.flip-card.play .flip-top
+  animation: flip-top 0.25s ease-in forwards
+
+.flip-card.play .flip-bottom
+  animation: flip-bottom 0.25s 0.25s ease-out forwards
+
+@keyframes flip-top
+  0%
+    transform: rotateX(0deg)
+  100%
+    transform: rotateX(-90deg)
+
+@keyframes flip-bottom
+  0%
+    transform: rotateX(90deg)
+  100%
+    transform: rotateX(0deg)
+
+.hint
+  margin-top: 18px
+  color: #4a3c5e
+  font-size: 14px
+  letter-spacing: 0.5px
