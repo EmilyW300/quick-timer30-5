@@ -1,4 +1,4 @@
-var TOTAL_SECONDS, state, digitElements, slots, formatTime, updateDisplay, setRunning, startPomodoro, pauseTimer, resumeTimer, restartTimer, tick, applySceneProgress, resetScenes, renderPauseSquares, setup;
+var TOTAL_SECONDS, state, digitElements, slots, formatTime, updateDisplay, setRunning, resetPauses, startPomodoro, pauseTimer, resumeTimer, restartTimer, tick, applySceneProgress, resetScenes, renderPauseSquares, setup;
 
 TOTAL_SECONDS = 25 * 60;
 
@@ -34,9 +34,21 @@ updateDisplay = function(){
 };
 
 setRunning = function(isRunning){
+  var icon, pauseBtn;
   state.running = isRunning;
-  document.getElementById('pause-btn').classList.toggle('active', !state.running && state.remaining !== TOTAL_SECONDS);
+  pauseBtn = document.getElementById('pause-btn');
+  icon = pauseBtn.querySelector('.icon');
+  pauseBtn.classList.toggle('active', !state.running && state.remaining !== TOTAL_SECONDS);
+  pauseBtn.setAttribute('aria-label', state.running ? '暫停' : '繼續');
+  if (icon) {
+    icon.textContent = state.running ? '⏸️' : '▶️';
+  }
   return document.getElementById('tomato-btn').classList.toggle('active', state.running);
+};
+
+resetPauses = function(){
+  state.pauseCount = 0;
+  return renderPauseSquares();
 };
 
 applySceneProgress = function(){
@@ -88,6 +100,7 @@ startPomodoro = function(){
     clearInterval(state.timer);
   }
   resetScenes();
+  resetPauses();
   state.remaining = TOTAL_SECONDS;
   updateDisplay();
   setRunning(true);
@@ -119,6 +132,7 @@ restartTimer = function(){
     clearInterval(state.timer);
   }
   resetScenes();
+  resetPauses();
   state.remaining = TOTAL_SECONDS;
   updateDisplay();
   setRunning(false);
@@ -145,8 +159,7 @@ setup = function(){
     return restartTimer();
   });
   document.getElementById('reset-pauses').addEventListener('click', function(){
-    state.pauseCount = 0;
-    return renderPauseSquares();
+    return resetPauses();
   });
   renderPauseSquares();
   return updateDisplay();

@@ -23,8 +23,16 @@ update-display = ->
 
 set-running = (is-running) ->
   state.running = is-running
-  document.getElementById('pause-btn').classList.toggle 'active', !state.running and state.remaining != TOTAL-SECONDS
+  pause-btn = document.getElementById 'pause-btn'
+  icon = pause-btn.querySelector '.icon'
+  pause-btn.classList.toggle 'active', !state.running and state.remaining != TOTAL-SECONDS
+  pause-btn.setAttribute 'aria-label', if state.running then '暫停' else '繼續'
+  icon.textContent = if state.running then '⏸️' else '▶️' if icon
   document.getElementById('tomato-btn').classList.toggle 'active', state.running
+
+reset-pauses = ->
+  state.pause-count = 0
+  render-pause-squares!
 
 apply-scene-progress = ->
   if state.elapsed >= 30 => document.body.classList.add 'show-moon'
@@ -58,6 +66,7 @@ tick = ->
 start-pomodoro = ->
   if state.timer => clearInterval state.timer
   reset-scenes!
+  reset-pauses!
   state.remaining = TOTAL-SECONDS
   update-display!
   set-running true
@@ -80,6 +89,7 @@ resume-timer = ->
 restart-timer = ->
   if state.timer => clearInterval state.timer
   reset-scenes!
+  reset-pauses!
   state.remaining = TOTAL-SECONDS
   update-display!
   set-running false
@@ -95,8 +105,7 @@ setup = ->
     else resume-timer!
   document.getElementById('restart-btn').addEventListener 'click', -> restart-timer!
   document.getElementById('reset-pauses').addEventListener 'click', ->
-    state.pause-count = 0
-    render-pause-squares!
+    reset-pauses!
   render-pause-squares!
   update-display!
 
