@@ -1,9 +1,11 @@
-var TOTAL_SECONDS, state, digits, slots, formatTime, flipTo, updateDisplay, finish, resetTimer, startPomodoro, setup;
+var TOTAL_SECONDS, state, digits, slots, formatTime, flipTo, updateDisplay, finish, updatePauseCount, updatePauseButton, resetTimer, startInterval, pauseTimer, resumeTimer, startPomodoro, setup;
 TOTAL_SECONDS = 25 * 60;
 state = {
   remaining: TOTAL_SECONDS,
   timer: null,
-  endSound: null
+  endSound: null,
+  pauseCount: 0,
+  paused: false
 };
 digits = {};
 slots = ['m-ten', 'm-one', 's-ten', 's-one'];
@@ -51,9 +53,26 @@ finish = function(){
     clearInterval(state.timer);
     state.timer = null;
   }
+  state.paused = false;
   if (state.endSound) {
     state.endSound.currentTime = 0;
-    return state.endSound.play();
+    state.endSound.play();
+  }
+  return updatePauseButton();
+};
+updatePauseCount = function(){
+  return document.getElementById('pause-count').textContent = state.pauseCount;
+};
+updatePauseButton = function(){
+  var label, pauseBtn;
+  pauseBtn = document.getElementById('pause-btn');
+  label = pauseBtn.querySelector('.text');
+  if (state.paused && !state.timer) {
+    pauseBtn.classList.add('paused');
+    return label.textContent = 'Resume';
+  } else {
+    pauseBtn.classList.remove('paused');
+    return label.textContent = 'Pause';
   }
 };
 resetTimer = function(){
@@ -61,11 +80,14 @@ resetTimer = function(){
     clearInterval(state.timer);
   }
   state.remaining = TOTAL_SECONDS;
-  return state.timer = null;
-};
-startPomodoro = function(){
-  resetTimer();
+  state.timer = null;
+  state.paused = false;
+  state.pauseCount = 0;
   updateDisplay(true);
+  updatePauseCount();
+  return updatePauseButton();
+};
+startInterval = function(){
   return state.timer = setInterval(function(){
     if (state.remaining > 0) {
       state.remaining -= 1;
@@ -76,6 +98,28 @@ startPomodoro = function(){
     }
   }, 1000);
 };
+pauseTimer = function(){
+  if (state.timer) {
+    clearInterval(state.timer);
+    state.timer = null;
+    state.paused = true;
+    state.pauseCount += 1;
+    updatePauseCount();
+    return updatePauseButton();
+  }
+};
+resumeTimer = function(){
+  if (state.paused && !state.timer && state.remaining > 0) {
+    startInterval();
+    state.paused = false;
+    return updatePauseButton();
+  }
+};
+startPomodoro = function(){
+  resetTimer();
+  startInterval();
+  return updatePauseButton();
+};
 setup = function(){
   slots.map(function(it){
     return digits[it] = document.querySelector("[data-slot=" + it + "]");
@@ -85,7 +129,19 @@ setup = function(){
   document.getElementById('tomato-btn').addEventListener('click', function(){
     return startPomodoro();
   });
-  return updateDisplay(true);
+  document.getElementById('pause-btn').addEventListener('click', function(){
+    if (state.timer) {
+      return pauseTimer();
+    } else {
+      return resumeTimer();
+    }
+  });
+  document.getElementById('reset-btn').addEventListener('click', function(){
+    return resetTimer();
+  });
+  updateDisplay(true);
+  updatePauseCount();
+  return updatePauseButton();
 };
 window.onload = function(){
   return setup();
