@@ -7,11 +7,26 @@
   <script type="text/javascript" src="index.js"></script>
 </head>
 <body>
+  <div class="cosmos">
+    <div class="stars"></div>
+    <div class="stars stars-b"></div>
+    <div class="moon"></div>
+  </div>
   <div class="timer-page">
-    <button id="tomato-btn" type="button">
-      <span class="icon">🍅</span>
-      <span class="text">25 分鐘番茄鐘</span>
-    </button>
+    <div class="controls">
+      <button id="tomato-btn" class="control-btn" type="button">
+        <span class="icon">🍅</span>
+        <span class="text">Start 25-min timer</span>
+      </button>
+      <button id="pause-btn" class="control-btn" type="button">
+        <span class="icon">🍅</span>
+        <span class="text">Pause</span>
+      </button>
+      <button id="reset-btn" class="control-btn" type="button">
+        <span class="icon">🍅</span>
+        <span class="text">Reset</span>
+      </button>
+    </div>
     <div class="clock" role="timer" aria-live="polite">
       <div class="flip-card" data-slot="m-ten" data-value="2">
         <span class="top">2</span>
@@ -39,7 +54,15 @@
         <span class="flip-bottom">0</span>
       </div>
     </div>
-    <p class="hint">點擊蕃茄開始 25 分鐘專注倒數，時間會以復古翻頁鐘呈現。</p>
+    <div class="pause-meter" role="status" aria-live="polite">
+      <div class="meter-icon" aria-hidden="true">
+        <span class="icon">🍅</span>
+      </div>
+      <div class="meter-text">
+        <div class="meter-label">Pause count</div>
+        <div class="meter-number" id="pause-count">0</div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
